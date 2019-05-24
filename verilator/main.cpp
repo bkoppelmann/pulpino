@@ -129,21 +129,21 @@ typedef struct {
 
 void preload_hex(Vpulpino_top *top, VerilatedVcdC *tfp, const char *filepath)
 {
-    FILE *fp = fopen(filepath, "r");
-    char buf[255];
+    std::ifstream inputFileStream("../pulpino/verilator/sw/wake.hex");
+	std::string line;
+	std::vector<HexData*> data;
+	while(std::getline(inputFileStream, line)){
+		std::istringstream lineStream(line);
+		HexData *elm = new HexData();
+		char dummy;
+		lineStream >> std::hex >> elm->addr >> dummy >> elm->data;
+		data.push_back(elm);
+
+	}
+    
     uint32_t spi_old_addr=0;
     uint32_t mem_start=0;
-    std::vector<HexData*> data;
-
-    while (fgets(buf, 255, (FILE*) fp)) {
-        char *ptr;
-        HexData *elm = (HexData*)malloc(sizeof(HexData));
-        ptr = strtok(buf, "_");
-        elm->addr = (uint32_t)strtol(ptr, NULL, 16);
-        ptr = strtok(NULL, "_");
-        elm->data = (uint32_t)strtol(ptr, NULL, 16);
-        data.push_back(elm);
-    }
+ 
     printf("Preloading Instruction RAM\n");
     spi_old_addr = data[0]->addr - 4;
     for (uint64_t i=0; i < data.size(); i++) {
