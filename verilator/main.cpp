@@ -121,45 +121,38 @@ void run_tick_clk(Vpulpino_top *tb, VerilatedVcdC *tfp)
 #endif
 }
 
-typedef struct {
-    uint32_t addr;
-    uint32_t data;
-} HexData;
-
 
 void preload_hex(Vpulpino_top *top, VerilatedVcdC *tfp, const char *filepath)
 {
-    std::ifstream inputFileStream("../pulpino/verilator/sw/wake.hex");
+    	std::ifstream inputFileStream("../pulpino/verilator/sw/wake.hex");
 	std::string line;
-	std::vector<HexData*> data;
+	std::map<uint32_t,uint32_t> mymap;
 	while(std::getline(inputFileStream, line)){
 		std::istringstream lineStream(line);
-		HexData *elm = new HexData();
+		uint32_t addr,data;
 		char dummy;
-		lineStream >> std::hex >> elm->addr >> dummy >> elm->data;
-		data.push_back(elm);
-
+		lineStream >> std::hex >> addr >> dummy >> data;
+		mymap.insert ( std::pair<uint32_t,uint32_t>(addr,data) );
+		lineStream.close();
 	}
-    
-    uint32_t spi_old_addr=0;
-    uint32_t mem_start=0;
- 
-    printf("Preloading Instruction RAM\n");
-    spi_old_addr = data[0]->addr - 4;
-    for (uint64_t i=0; i < data.size(); i++) {
-        if (data[i]->addr != (spi_old_addr + 4)) {
-            printf("prev address %x current addr %x\n", spi_old_addr, data[i]->addr);
-            printf("Preloading Data RAM\n");
-            mem_start = i;
-        }
-        if (mem_start == 0) {
-            top->pulpino_top__DOT__core_region_i__DOT__instr_mem__DOT__sp_ram_wrap_i__DOT__sp_ram_i__DOT__mem[i] = data[i]->data;
-        } else {
-            top->pulpino_top__DOT__core_region_i__DOT__data_mem__DOT__sp_ram_i__DOT__mem[i - mem_start] = data[i]->data;
-        }
-        spi_old_addr = data[i]->addr;
-    }
-    fclose(fp);
+
+	uint32_t mem_start=0;
+	printf("Preloading Instruction RAM\n");
+	std::map<uint32_t,uint32_t>::iterator it = mymap.begin();
+	for (it=mymap.begin(); it!=mymap.end(); ++it){
+		if (it->first != (std::prev(it)->first + 4)) {
+			printf("prev address %x current addr %x\n", std::prev(it)->first, it->first);
+			printf("Preloading Data RAM\n");
+			mem_start = it->first;
+		}
+		if (mem_start == 0) {
+			riscv->pulpino_top__DOT__core_region_i__DOT__instr_mem__DOT__sp_ram_wrap_i__DOT__sp_ram_i__DOT__mem[it->first/4] = it->second;
+		} else {
+			riscv->pulpino_top__DOT__core_region_i__DOT__data_mem__DOT__sp_ram_i__DOT__mem[(it->first - mem_start)/4] = it->second;
+		}
+	}
+    	inputFileStream.close();
+
 }
 
 void raise_gpio(Vpulpino_top *top, VerilatedVcdC *tfp)
