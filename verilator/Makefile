@@ -7,7 +7,7 @@ RTL=../rtl/pulpino_top.sv
 TOP=pulpino_top
 SIM=$(TOP)_sim.elf
 
-CFLAGS=-Iobj_dir -I/usr/share/verilator/include -g3
+CFLAGS=-Iobj_dir -I/usr/share/verilator/include -g3 -std=c++11
 VERICSRC=/usr/share/verilator/include/verilated_vcd_c.cpp \
 		 /usr/share/verilator/include/verilated.cpp
 VFLAGS=-sv \
