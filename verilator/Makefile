@@ -7,9 +7,9 @@ RTL=../rtl/pulpino_top.sv
 TOP=pulpino_top
 SIM=$(TOP)_sim.elf
 
-CFLAGS=-Iobj_dir -I/usr/share/verilator/include -g3 -std=c++11
-VERICSRC=/usr/share/verilator/include/verilated_vcd_c.cpp \
-		 /usr/share/verilator/include/verilated.cpp
+CFLAGS=-Iobj_dir -I/mingw64/share/verilator/include -g3 -std=c++11
+VERICSRC=/mingw64/share/verilator/include/verilated_vcd_c.cpp \
+		 /mingw64/share/verilator/include/verilated.cpp
 VFLAGS=-sv \
 	   --trace \
 	   --trace-max-array 8192 \
