@@ -175,10 +175,10 @@ void run_simulation(Vpulpino_top *top, VerilatedVcdC *tfp)
     top->fetch_enable_i = 1;
     do {
         run_tick_clk(top, tfp);
-        if (raise_interrupt == 1) {
+        /*/if (raise_interrupt == 1) {
             raise_gpio(top, tfp);
-            //raise_interrupt = 0;
-        }
+            raise_interrupt = 0;
+        }*/
     } while ((top->gpio_out & (1 << 8)) == 0);
 }
 
