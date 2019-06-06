@@ -246,11 +246,11 @@ int main(int argc, char **argv) {
 
     //signal(SIGUSR1, sig_user_handler);
     //pid_t pid = fork();
-    //if (pid == 0) {
+    /*if (pid == 0) {
         read_user_input();
-    /*} else {
+    } else {*/
         run_simulation(top, tfp);
-    }*/
+    //}
 #ifdef VM_TRACE
     if (tfp)
         tfp->close();
