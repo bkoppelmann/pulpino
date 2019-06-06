@@ -25,6 +25,8 @@
 #include <ctime>
 #include <signal.h>
 #include <unistd.h>
+#include <sstream>
+#include <fstream>
 
 #include "Vpulpino_top.h"
 #include "verilated_vcd_c.h"
@@ -124,7 +126,7 @@ void run_tick_clk(Vpulpino_top *tb, VerilatedVcdC *tfp)
 
 void preload_hex(Vpulpino_top *top, VerilatedVcdC *tfp, const char *filepath)
 {
-    	std::ifstream inputFileStream("../pulpino/verilator/sw/wake.hex");
+    std::ifstream inputFileStream(filepath);
 	std::string line;
 	std::map<uint32_t,uint32_t> mymap;
 	while(std::getline(inputFileStream, line)){
@@ -133,7 +135,6 @@ void preload_hex(Vpulpino_top *top, VerilatedVcdC *tfp, const char *filepath)
 		char dummy;
 		lineStream >> std::hex >> addr >> dummy >> data;
 		mymap.insert ( std::pair<uint32_t,uint32_t>(addr,data) );
-		lineStream.close();
 	}
 
 	uint32_t mem_start=0;
@@ -146,13 +147,12 @@ void preload_hex(Vpulpino_top *top, VerilatedVcdC *tfp, const char *filepath)
 			mem_start = it->first;
 		}
 		if (mem_start == 0) {
-			riscv->pulpino_top__DOT__core_region_i__DOT__instr_mem__DOT__sp_ram_wrap_i__DOT__sp_ram_i__DOT__mem[it->first/4] = it->second;
+			top->pulpino_top__DOT__core_region_i__DOT__instr_mem__DOT__sp_ram_wrap_i__DOT__sp_ram_i__DOT__mem[it->first/4] = it->second;
 		} else {
-			riscv->pulpino_top__DOT__core_region_i__DOT__data_mem__DOT__sp_ram_i__DOT__mem[(it->first - mem_start)/4] = it->second;
+			top->pulpino_top__DOT__core_region_i__DOT__data_mem__DOT__sp_ram_i__DOT__mem[(it->first - mem_start)/4] = it->second;
 		}
 	}
-    	inputFileStream.close();
-
+    inputFileStream.close();
 }
 
 void raise_gpio(Vpulpino_top *top, VerilatedVcdC *tfp)

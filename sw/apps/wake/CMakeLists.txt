@@ -1,1 +1,1 @@
-add_application(wake)
+add_application(wake wake.c)

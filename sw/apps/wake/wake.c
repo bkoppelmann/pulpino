@@ -31,6 +31,7 @@ int main()
   set_gpio_pin_irq_type(16, GPIO_IRQ_RISE);
   IER = 0x1 << GPIO_EVENT;
   int_enable();
+  printf("Waiting for Interrupts ... \n");
   while (1) {
     sleep();
   }
